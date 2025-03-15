@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+      <UserSecretsId>e7fea2d8-6b09-4ecb-945f-f5cd4b97665d</UserSecretsId>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AWSSDK.S3" Version="3.7.415.18" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Controllers\" />
+    </ItemGroup>
+
+</Project>
