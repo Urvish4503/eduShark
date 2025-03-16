@@ -352,3 +352,5 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+
+*/**/appsettings.Development.json

@@ -1,3 +1,4 @@
+using Amazon.S3;
 using AwsS3.Models;
 using AwsServices.Services;
 using Microsoft.AspNetCore.Http;
@@ -11,15 +12,18 @@ namespace api.Controllers
     {
         private readonly ILogger<FileManagementController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IAmazonS3 _amazonS3;
         private readonly IStorageService _storageService;
 
         public FileManagementController(
             ILogger<FileManagementController> logger,
             IConfiguration configuration,
+            IAmazonS3 amazonS3,
             IStorageService storageService)
         {
             _logger = logger;
             _configuration = configuration;
+            _amazonS3 = amazonS3;
             _storageService = storageService;
         }
 
@@ -41,17 +45,22 @@ namespace api.Controllers
                 return BadRequest("No files");
             }
 
-            var awsCredentials = new AwsCredentials()
+            var awsConfig = _configuration.GetSection("AWS");
+            
+            _logger.LogInformation("AWS Configuration:");
+            _logger.LogInformation($"Region: {awsConfig["AccessKey"]}");
+            _logger.LogInformation($"Bucket: {awsConfig["SecretKey"]}");
+
+            var awsCredentials = new AwsCredentials
             {
-                AccessKey = _configuration["AwsConfiguration:AWSAccessKey"]!,
-                SecretKey = _configuration["AwsConfiguration:AWSSecretKey"]!,
-                BucketName = _configuration["AwsConfiguration:BucketName"]!,
+                AccessKey = awsConfig["AccessKey"]!,
+                SecretKey = awsConfig["SecretKey"]!,
+                Region = awsConfig["Region"]!,
+                BucketName = awsConfig["BucketName"]!
             };
 
-            Console.WriteLine($"AccessKey: {awsCredentials.AccessKey}");
-            Console.WriteLine(
-                $"SecretKey: {awsCredentials}"); // Only print first 3 chars for security
-            Console.WriteLine($"BucketName: {awsCredentials.BucketName}");
+            // checking if the values are null or not
+
 
             var uploadObjects = new List<S3UploadObject>();
 
@@ -72,9 +81,22 @@ namespace api.Controllers
                 uploadObjects.Add(uploadObject);
             }
 
-            var response = await _storageService.UploadFiles(uploadObjects, awsCredentials);
+            var responses = await _storageService.UploadFiles(uploadObjects, awsCredentials);
 
-            return Ok(response);
+
+            var errorResponses = responses.Where(r => r.StatusCode >= 400).ToList();
+
+            if (errorResponses.Any())
+            {
+                // Return appropriate status code based on errors
+                var firstError = errorResponses.First();
+                return StatusCode(firstError.StatusCode, new
+                {
+                    Error = errorResponses
+                });
+            }
+
+            return Ok(responses);
         }
     }
 }

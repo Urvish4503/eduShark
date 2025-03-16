@@ -1,3 +1,5 @@
+using Amazon.S3;
+using AwsS3.Models;
 using AwsServices.Services;
 
 namespace api;
@@ -15,10 +17,9 @@ public class Program
         builder.Services.AddOpenApi();
 
         builder.Services.AddScoped<IStorageService, S3StorageService>();
-        if (builder.Environment.IsDevelopment())
-        {
-            builder.Configuration.AddUserSecrets<Program>();
-        }
+        
+        builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+        builder.Services.AddAWSService<IAmazonS3>();
 
         var app = builder.Build();
 
