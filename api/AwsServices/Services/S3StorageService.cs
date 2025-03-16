@@ -26,6 +26,9 @@ public class S3StorageService : IStorageService
         {
             var response = new S3ResponseDto();
 
+            Console.WriteLine(file.Key);
+            
+
             try
             {
                 var uploadRequest = new TransferUtilityUploadRequest()

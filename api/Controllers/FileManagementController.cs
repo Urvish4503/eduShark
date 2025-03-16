@@ -46,10 +46,6 @@ namespace api.Controllers
             }
 
             var awsConfig = _configuration.GetSection("AWS");
-            
-            _logger.LogInformation("AWS Configuration:");
-            _logger.LogInformation($"Region: {awsConfig["AccessKey"]}");
-            _logger.LogInformation($"Bucket: {awsConfig["SecretKey"]}");
 
             var awsCredentials = new AwsCredentials
             {
@@ -58,9 +54,7 @@ namespace api.Controllers
                 Region = awsConfig["Region"]!,
                 BucketName = awsConfig["BucketName"]!
             };
-
-            // checking if the values are null or not
-
+            
 
             var uploadObjects = new List<S3UploadObject>();
 
